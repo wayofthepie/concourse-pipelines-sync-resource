@@ -83,6 +83,7 @@ if [ -n "$config" ]; then
   config_pipelines="$(jq -c '.pipelines // [] | .[]' "$config")"
   if [ -n "$config_pipelines" ]; then
     while read pipeline ; do
+      log "Creating pipelines var"
       pipelines=$(jq -c ". + [($pipeline | .config = (\"${base}/\" + .config) | .vars_from = (.vars_from // [] | map(\"${base}/\" + .)))]" <<< "$pipelines")
     done <<< "$config_pipelines"
   fi
@@ -151,6 +152,7 @@ pipeline_payload="$TMPDIR/pipelines-sync-resource-pipeline"
 log "Searching pipeline files..."
 files="$(jq -c '.[]' <<< "$pipelines")"
 if [ -n "$files" ]; then
+  log "Got some files..."
   while read pipeline ; do
     pipeline_name=$(echo "$pipeline" | jq -r '.name')
     pipeline_config=$(echo "$pipeline" | jq -r '.config')
